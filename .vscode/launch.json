@@ -1,11 +1,8 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(gdb) Launch",
+      "name": "Debug RCPP",
       "type": "cppdbg",
       "request": "launch",
       "program": "/usr/lib/R/bin/exec/R",
@@ -31,6 +28,18 @@
         "program": "/Library/Frameworks/R.framework/Resources/bin/exec/R",
         "MIMode": "lldb"
       }
+    },
+    {
+      "type": "R-Debugger",
+      "name": "Debug R-Package",
+      "request": "launch",
+      "debugMode": "workspace",
+      "workingDirectory": "${workspaceFolder}",
+      "loadPackages": [
+        "."
+      ],
+      "includePackageScopes": true,
+      "allowGlobalDebugging": true
     }
   ]
 }
