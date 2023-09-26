@@ -20,14 +20,14 @@ arma::mat mrls(const arma::vec &y,
     int nrho = rhoseq.n_cols;
     int jdx = 0;
 
-    arma::vec Kmtx(k, arma::fill::zeros);
-    arma::mat kk(1, 1);
-    arma::cube beta(nT - start + 1, k, nrho, arma::fill::zeros);
-    arma::cube betao(nT - start + 1, k, nrho, arma::fill::zeros);
-    arma::mat fit(nT - start + 1, nrho);
-    arma::vec wk(k);
-    arma::mat xpxi(k, k);
-    arma::mat diagmatlambda(k, k, arma::fill::eye);
+    vec Kmtx(k, fill::zeros);
+    mat kk(1, 1);
+    cube beta(nT - start + 1, k, nrho, fill::zeros);
+    cube betao(nT - start + 1, k, nrho, fill::zeros);
+    mat fit(nT - start + 1, nrho);
+    vec wk(k);
+    mat xpxi(k, k);
+    mat diagmatlambda(k, k, fill::eye);
     diagmatlambda *= lambda;
 
     for (int irho = 0; irho < nrho; irho++)
@@ -36,10 +36,10 @@ arma::mat mrls(const arma::vec &y,
         double rho = rhoseq(nT - 2, irho);
         int cutn = (int)(log(eps) / log(rho)) + 1;
 
-        arma::vec refitseq = arma::regspace(start, refitseqby(irho), ((double)nT) + refitseqby(irho));
+        vec refitseq = regspace(start, refitseqby(irho), ((double)nT) + refitseqby(irho));
 
         int h = 0;
-        arma::vec w = arma::linspace<arma::vec>(0, 1, nT - .5) * 0 + 1;
+        vec w = linspace<vec>(0, 1, nT - .5) * 0 + 1;
         for (int t = start; t < nT; t++)
         { // nT
             jdx = t - start;
@@ -47,21 +47,21 @@ arma::mat mrls(const arma::vec &y,
             {
                 int axt = (t + cutn - abs(t - cutn)) / 2;
                 w = (rhoseq.col(irho)).tail(axt);
-                arma::mat xr = (x.rows(t - axt, t - 1));
-                arma::colvec yr = y.subvec(t - axt, t - 1);
-                arma::colvec wts = sqrt(w);
+                mat xr = (x.rows(t - axt, t - 1));
+                colvec yr = y.subvec(t - axt, t - 1);
+                colvec wts = sqrt(w);
                 xpxi = (((xr.each_col() % wts).t() * (xr.each_col() % wts)) + diagmatlambda * sum(w)).i(); // diagmatlambda
-                betao(arma::span(jdx), arma::span(0, k - 1), arma::span(irho)) = beta(arma::span(jdx), arma::span(0, k - 1), arma::span(irho));
-                beta(arma::span(jdx), arma::span(0, k - 1), arma::span(irho)) = (xpxi * (((xr.each_col() % wts).t()) * (yr % wts))).t();
+                betao(span(jdx), span(0, k - 1), span(irho)) = beta(span(jdx), span(0, k - 1), span(irho));
+                beta(span(jdx), span(0, k - 1), span(irho)) = (xpxi * (((xr.each_col() % wts).t()) * (yr % wts))).t();
                 h = h + 1;
             }
             wk = (x.row(t) * xpxi).t();
             kk = (1 + wk.t() * (x.row(t)).t());
-            xpxi = (xpxi - (wk * wk.t()) / arma::as_scalar(rho + wk.t() * (x.row(t)).t())) / rho;
+            xpxi = (xpxi - (wk * wk.t()) / as_scalar(rho + wk.t() * (x.row(t)).t())) / rho;
             Kmtx = xpxi * (x.row(t)).t();
-            arma::rowvec tmpbeta = beta(arma::span(jdx), arma::span(0, k - 1), arma::span(irho));
+            rowvec tmpbeta = beta(span(jdx), span(0, k - 1), span(irho));
 
-            beta(arma::span(jdx + 1), arma::span(0, k - 1), arma::span(irho)) = tmpbeta - (Kmtx.t() * arma::as_scalar(x.row(t) * trans(tmpbeta) - y(t)));
+            beta(span(jdx + 1), span(0, k - 1), span(irho)) = tmpbeta - (Kmtx.t() * as_scalar(x.row(t) * trans(tmpbeta) - y(t)));
         } // t
         fit.col(irho) = sum((x.rows(nTX - (nT - start + 1), nTX - 1)) % beta.slice(irho), 1);
     } // rho
