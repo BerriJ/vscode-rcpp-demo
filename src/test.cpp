@@ -1,4 +1,4 @@
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 
 using namespace Rcpp;
 
@@ -6,9 +6,11 @@ using namespace Rcpp;
 //' @param x a numeric vector
 //' @export
 // [[Rcpp::export]]
-double calc_sum(NumericVector x) {
+double calc_sum(NumericVector x)
+{
   double sum = 0;
-  for (int i = 0; i < x.size(); ++i) {
+  for (int i = 0; i < x.size(); ++i)
+  {
     std::cout << i << std::endl;
     sum += x[i];
   }
